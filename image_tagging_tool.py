@@ -3,29 +3,30 @@ from __future__ import annotations
 import json
 import os
 import tkinter as tk
+import platform
 from tkinter import filedialog, messagebox, ttk
 
 from PIL import Image
 
 from constants import MAX_COLORS, IMG_SCALES, IMG_FILES, PT_SELECTED_EXTRA_SIZE, PT_BASE_SIZE, PT_ZOOM_SCALE_FACTOR, \
-	INTERVAL_SAVE, INTERVAL_POLL, PointsType
+	INTERVAL_SAVE, INTERVAL_POLL, PointsType, PT_OUTLINE_WIDTH
 from utils import generate_rainbow_colors, generate_image_pyramid, put_image_on_canvas, get_canvas_position, \
 	apply_image_scaling, in_canvas_coords, in_image_coords, Canvas, reset_canvases, format_tag, make_pairs, \
-	read_tags_file, get_tag_name_convention, find_closest
+	read_tags_file, get_tag_name_convention, find_closest, get_centered_oval_bbox
 
 
 class ImageTaggingTool:
-	def __init__(self):
+	def __init__(self, small_window: bool=False):
 		self.debug = False
 		self._save_scheduler_id = None
 		self._poll_scheduler_id = None
 
 		self.root = tk.Tk()
-		RES_W, RES_H = self.root.winfo_screenwidth(), self.root.winfo_screenheight()
-		if RES_W <= 1920:
+		RES_W, RES_H = self.root.wm_maxsize()
+		if RES_W <= 1920 or small_window:
 			CANVAS_W = 800
 			CANVAS_H = 800
-			TAG_W = 22
+			TAG_W = 20
 		else:
 			CANVAS_W = 1100
 			CANVAS_H = 1100
@@ -33,7 +34,11 @@ class ImageTaggingTool:
 
 		self.root.title("Image Correspondence Tagging Tool")
 		self.root.geometry(f"{RES_W}x{RES_H}")
-		self.root.state("zoomed")
+
+		if platform.system() == "Windows":
+			self.root.state("zoomed")  # Maximized for Windows
+		elif platform.system() == "Linux":
+			self.root.attributes("-zoomed", True)  # Maximized for Linux
 
 		self.colors = generate_rainbow_colors(MAX_COLORS)
 
@@ -73,7 +78,7 @@ class ImageTaggingTool:
 
 		# Tags Frame
 		self.tags_frame = tk.Frame(self.root)
-		self.tags_frame.grid(row=0, rowspan=6, column=10, sticky='nsew', padx=20)
+		self.tags_frame.grid(row=0, rowspan=6, column=10, sticky='nsew', padx=5)
 
 		self.tag_list_label = tk.Label(self.tags_frame, bg='lightgrey', text="Tagged Points", font=("Arial", 16, "bold"))
 		self.tag_list_label.pack(side="top", anchor='n')
@@ -98,7 +103,8 @@ class ImageTaggingTool:
 		self.img0_label = tk.Label(self.canvas0_frame, bg='light grey', text="Image 1", font=("Arial", 18))
 		self.img0_label.pack(side="top", fill='x', padx=5)
 
-		self.canvas0 = Canvas(self.canvas0_frame, bg="white", width=CANVAS_W, height=CANVAS_H)
+		self.canvas0 = Canvas(self.canvas0_frame, bg="white", width=CANVAS_W, height=CANVAS_H,
+							  borderwidth=0, highlightthickness=0)
 		self.canvas0.pack(expand=True)
 
 		self.canvas0.tag_text = tk.Label(self.canvas0_frame, text="", font=("Arial", 20, "bold"), fg="black")
@@ -114,7 +120,8 @@ class ImageTaggingTool:
 		self.img1_label = tk.Label(self.canvas1_frame, bg='light grey', text="Image 2", font=("Arial", 18))
 		self.img1_label.pack(side="top", fill='x', padx=5)
 
-		self.canvas1 = Canvas(self.canvas1_frame, bg="white", width=CANVAS_W, height=CANVAS_H)
+		self.canvas1 = Canvas(self.canvas1_frame, bg="white", width=CANVAS_W, height=CANVAS_H,
+							  borderwidth=0, highlightthickness=0)
 		self.canvas1.pack(expand=True)
 
 		self.canvas1.tag_text = tk.Label(self.canvas1_frame, text="", font=("Arial", 20, "bold"), fg="black")
@@ -303,15 +310,18 @@ class ImageTaggingTool:
 				outline = "#000000"
 				pt_size = PT_BASE_SIZE + PT_ZOOM_SCALE_FACTOR * (canvas.scale_idx + 1)
 
+			dim = 1 + pt_size * 2
 			color = self.colors[i % MAX_COLORS]
 			canvas_x, canvas_y = in_canvas_coords(point, canvas)
-			canvas.create_oval(canvas_x - pt_size, canvas_y - pt_size, canvas_x + pt_size, canvas_y + pt_size,
-			                   fill=color, outline=outline, tags="point")
+			x1, y1, x2, y2 = get_centered_oval_bbox((canvas_x, canvas_y), dim, dim, PT_OUTLINE_WIDTH)
+			canvas.create_oval(x1, y1, x2, y2, width=PT_OUTLINE_WIDTH, fill=color, outline=outline, tags="point")
 
 		if point := canvas.temp_point:
 			pt_size = PT_BASE_SIZE + PT_ZOOM_SCALE_FACTOR * (canvas.scale_idx + 1)
+			dim = 1 + pt_size * 2
 			canvas_x, canvas_y = in_canvas_coords(point, canvas)
-			canvas.create_oval(canvas_x - pt_size, canvas_y - pt_size, canvas_x + pt_size, canvas_y + pt_size,
+			x1, y1, x2, y2 = get_centered_oval_bbox((canvas_x, canvas_y), dim, dim, PT_OUTLINE_WIDTH)
+			canvas.create_oval(x1, y1, x2, y2, width=PT_OUTLINE_WIDTH,
 			                   fill="#000000", outline="#FFFFFF", tags="point")
 			canvas.tag_text.configure(text=f"({point[0]:.1f}, {point[1]:.1f})", fg="black")
 

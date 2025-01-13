@@ -117,6 +117,17 @@ def get_canvas_position(cursor_x: int | float, cursor_y: int | float, canvas) ->
 	return canvas_cursor_x, canvas_cursor_y
 
 
+def get_centered_oval_bbox(center_xy: tuple[float, float],
+						   width: int, height: int,
+						   outline_width: int) -> tuple[float, float, float, float]:
+	center_x, center_y = center_xy
+	x1 = center_x - width // 2 - outline_width
+	y1 = center_y - height // 2 - outline_width
+	x2 = center_x + width // 2
+	y2 = center_y + height // 2
+	return x1, y1, x2, y2
+
+
 def apply_image_scaling(canvas: Canvas, event_point: tuple[float, float]):
 	canvas.zoom_scale = IMG_SCALES[canvas.scale_idx]
 	old_x, old_y = canvas.coords("image")

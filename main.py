@@ -1,3 +1,5 @@
+import argparse
+
 from image_tagging_tool import ImageTaggingTool
 import sys
 import traceback
@@ -16,4 +18,7 @@ def log_exceptions(exc_type, exc_value, exc_traceback):
 
 if "__main__" == __name__:
     sys.excepthook = log_exceptions
-    ImageTaggingTool()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--small-window", action="store_true", help="Force the window to small size.")
+    args = parser.parse_args()
+    ImageTaggingTool(args.small_window)
