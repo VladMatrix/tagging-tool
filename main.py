@@ -6,7 +6,7 @@ import traceback
 from datetime import datetime
 
 
-__VERSION__ = "1.0.0-rc"
+__VERSION__ = "1.0.1-rc"
 
 
 def log_exceptions(exc_type, exc_value, exc_traceback):
