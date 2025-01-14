@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+
+__VERSION__ = "1.0.2-rc"
+
 MAX_COLORS = 10
 IMG_SCALES = (1, 1.5, 2.1, 3, 4.5, 6.5, 9)
 IMG_FILES = (".jpg", ".jpeg", ".png")

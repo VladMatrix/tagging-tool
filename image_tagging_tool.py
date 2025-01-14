@@ -8,7 +8,8 @@ from tkinter import filedialog, messagebox, ttk
 
 from PIL import Image
 
-from constants import MAX_COLORS, IMG_SCALES, IMG_FILES, PT_SELECTED_EXTRA_SIZE, PT_BASE_SIZE, PT_ZOOM_SCALE_FACTOR, \
+from constants import __VERSION__, MAX_COLORS, IMG_SCALES, IMG_FILES, PT_SELECTED_EXTRA_SIZE, PT_BASE_SIZE, \
+	PT_ZOOM_SCALE_FACTOR, \
 	INTERVAL_SAVE, INTERVAL_POLL, PointsType, PT_OUTLINE_WIDTH
 from utils import generate_rainbow_colors, generate_image_pyramid, put_image_on_canvas, get_canvas_position, \
 	apply_image_scaling, in_canvas_coords, in_image_coords, Canvas, reset_canvases, format_tag, make_pairs, \
@@ -16,7 +17,7 @@ from utils import generate_rainbow_colors, generate_image_pyramid, put_image_on_
 
 
 class ImageTaggingTool:
-	def __init__(self, small_window: bool=False):
+	def __init__(self, small_window: bool):
 		self.debug = False
 		self._save_scheduler_id = None
 		self._poll_scheduler_id = None
@@ -24,9 +25,11 @@ class ImageTaggingTool:
 		self.root = tk.Tk()
 		RES_W, RES_H = self.root.wm_maxsize()
 		if RES_W <= 1920 or small_window:
+			# RES_H = 1080
+			# RES_W = 1920
 			CANVAS_W = 800
 			CANVAS_H = 800
-			TAG_W = 20
+			TAG_W = 24
 		else:
 			CANVAS_W = 1100
 			CANVAS_H = 1100
@@ -55,6 +58,10 @@ class ImageTaggingTool:
 		self.pan_start_x = 0
 		self.pan_start_y = 0
 
+		# Brand version label
+		tk.Label(self.root, text=f"V{__VERSION__}", font=("Arial", 12)).grid(row=10, column=0, sticky='sw',
+		                                                                     padx=10, pady=20)
+
 		# Navigation buttons
 		self.button_prev = tk.Button(self.root, text="<< Z  ", command=self.prev_pair, state=tk.DISABLED)
 		self.button_prev.grid(row=6, column=3, sticky='se')
@@ -65,7 +72,8 @@ class ImageTaggingTool:
 		self.files_frame = tk.Frame(self.root, bg="lightgrey", padx=5, pady=5)
 		self.files_frame.grid(row=8, column=0, columnspan=3, padx=10, pady=10, sticky="nsew")
 
-		self.button_load_images = tk.Button(self.files_frame, text="Select Image Folder", command=self.load_image_pairs_and_tags)
+		self.button_load_images = tk.Button(self.files_frame, text="Select Image Folder",
+		                                    command=self.load_image_pairs_and_tags)
 		self.button_load_images.pack(side="left")
 
 		self.directory_label = tk.Label(self.files_frame, text="", font=("Arial", 12), padx=5, bg="lightgrey")
@@ -80,7 +88,8 @@ class ImageTaggingTool:
 		self.tags_frame = tk.Frame(self.root)
 		self.tags_frame.grid(row=0, rowspan=6, column=10, sticky='nsew', padx=5)
 
-		self.tag_list_label = tk.Label(self.tags_frame, bg='lightgrey', text="Tagged Points", font=("Arial", 16, "bold"))
+		self.tag_list_label = tk.Label(self.tags_frame, bg='lightgrey', text="Tagged Points",
+		                               font=("Arial", 16, "bold"))
 		self.tag_list_label.pack(side="top", anchor='n')
 
 		self.tag_list = tk.Listbox(self.tags_frame, selectmode=tk.SINGLE, font=("Arial", 14), width=TAG_W)
@@ -104,7 +113,7 @@ class ImageTaggingTool:
 		self.img0_label.pack(side="top", fill='x', padx=5)
 
 		self.canvas0 = Canvas(self.canvas0_frame, bg="white", width=CANVAS_W, height=CANVAS_H,
-							  borderwidth=0, highlightthickness=0)
+		                      borderwidth=0, highlightthickness=0)
 		self.canvas0.pack(expand=True)
 
 		self.canvas0.tag_text = tk.Label(self.canvas0_frame, text="", font=("Arial", 20, "bold"), fg="black")
@@ -121,7 +130,7 @@ class ImageTaggingTool:
 		self.img1_label.pack(side="top", fill='x', padx=5)
 
 		self.canvas1 = Canvas(self.canvas1_frame, bg="white", width=CANVAS_W, height=CANVAS_H,
-							  borderwidth=0, highlightthickness=0)
+		                      borderwidth=0, highlightthickness=0)
 		self.canvas1.pack(expand=True)
 
 		self.canvas1.tag_text = tk.Label(self.canvas1_frame, text="", font=("Arial", 20, "bold"), fg="black")

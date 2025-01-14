@@ -1,12 +1,10 @@
 import argparse
 
 from image_tagging_tool import ImageTaggingTool
+from constants import __VERSION__
 import sys
 import traceback
 from datetime import datetime
-
-
-__VERSION__ = "1.0.1-rc"
 
 
 def log_exceptions(exc_type, exc_value, exc_traceback):
