@@ -18,5 +18,10 @@ if "__main__" == __name__:
     sys.excepthook = log_exceptions
     parser = argparse.ArgumentParser()
     parser.add_argument("--small-window", action="store_true", help="Force the window to small size.")
+    parser.add_argument("--tiny-window", action="store_true", help="Force the window to tiny size.")
     args = parser.parse_args()
-    ImageTaggingTool(args.small_window)
+
+    if args.tiny_window and args.small_window:
+        raise RuntimeError("Only one of --tiny-window or --small-window can be used.")
+
+    ImageTaggingTool(args.small_window, args.tiny_window)

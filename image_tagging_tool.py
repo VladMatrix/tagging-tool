@@ -17,19 +17,25 @@ from utils import generate_rainbow_colors, generate_image_pyramid, put_image_on_
 
 
 class ImageTaggingTool:
-	def __init__(self, small_window: bool):
+	def __init__(self, small_window: bool, tiny_window: bool):
 		self.debug = False
 		self._save_scheduler_id = None
 		self._poll_scheduler_id = None
 
 		self.root = tk.Tk()
 		RES_W, RES_H = self.root.wm_maxsize()
-		if RES_W <= 1920 or small_window:
+		if RES_W < 1400 or tiny_window:
+			# RES_H = 768
+			# RES_W = 1366
+			CANVAS_W = 550
+			CANVAS_H = 550
+			TAG_W = 20
+		elif RES_W <= 1920 or small_window:
 			# RES_H = 1080
 			# RES_W = 1920
 			CANVAS_W = 800
 			CANVAS_H = 800
-			TAG_W = 24
+			TAG_W = 22
 		else:
 			CANVAS_W = 1100
 			CANVAS_H = 1100
@@ -37,6 +43,7 @@ class ImageTaggingTool:
 
 		self.root.title("Image Correspondence Tagging Tool")
 		self.root.geometry(f"{RES_W}x{RES_H}")
+		self.root_bg_color = self.root.cget("bg")
 
 		if platform.system() == "Windows":
 			self.root.state("zoomed")  # Maximized for Windows
@@ -60,7 +67,7 @@ class ImageTaggingTool:
 
 		# Brand version label
 		tk.Label(self.root, text=f"V{__VERSION__}", font=("Arial", 12)).grid(row=10, column=0, sticky='sw',
-		                                                                     padx=10, pady=20)
+		                                                                     padx=10, pady=0)
 
 		# Navigation buttons
 		self.button_prev = tk.Button(self.root, text="<< Z  ", command=self.prev_pair, state=tk.DISABLED)
@@ -69,7 +76,7 @@ class ImageTaggingTool:
 		self.button_next.grid(row=6, column=5, sticky='sw', ipadx=0)
 
 		# Files Frame
-		self.files_frame = tk.Frame(self.root, bg="lightgrey", padx=5, pady=5)
+		self.files_frame = tk.Frame(self.root, bg="lightgrey", padx=5, pady=2)
 		self.files_frame.grid(row=8, column=0, columnspan=3, padx=10, pady=10, sticky="nsew")
 
 		self.button_load_images = tk.Button(self.files_frame, text="Select Image Folder",
@@ -90,7 +97,7 @@ class ImageTaggingTool:
 
 		self.tag_list_label = tk.Label(self.tags_frame, bg='lightgrey', text="Tagged Points",
 		                               font=("Arial", 16, "bold"))
-		self.tag_list_label.pack(side="top", anchor='n')
+		self.tag_list_label.pack(side="top", anchor='n', pady=2)
 
 		self.tag_list = tk.Listbox(self.tags_frame, selectmode=tk.SINGLE, font=("Arial", 14), width=TAG_W)
 		self.tag_list.pack(expand=True, fill="both")
@@ -98,7 +105,7 @@ class ImageTaggingTool:
 		self.tag_list.bind("<Button-1>", self.clear_tag_selection_inside)
 		self.tag_list.bind("<Delete>", self.delete_tag)
 
-		self.loading_label = tk.Label(self.tags_frame, text="", bg="#F0F0F0", font=("Arial", 18, "bold italic"))
+		self.loading_label = tk.Label(self.tags_frame, text="", bg=self.root_bg_color, font=("Arial", 18, "bold italic"))
 		self.loading_label.pack(side='bottom', anchor='s', pady=1)
 
 		self.button_clear_all = tk.Button(self.tags_frame, text="Clear All", command=self.clear_all_tags, width=20)
@@ -229,7 +236,7 @@ class ImageTaggingTool:
 		# once everything is open, we can proceed to reset state and load everything
 		self.reset()
 		self.data_dir = image_dir
-		self.directory_label.configure(text=self.data_dir, bg="#F0F0F0")
+		self.directory_label.configure(text=self.data_dir, bg=self.root_bg_color)
 
 		for idx, (img0, img1) in enumerate(pairs_result):
 			self.image_pairs.append((os.path.join(image_dir, img0),
@@ -390,8 +397,8 @@ class ImageTaggingTool:
 			col_idx = (len(self.points) - 1) % MAX_COLORS
 			color = self.colors[col_idx]
 
-			self.canvas0.tag_text.configure(fg=color, bg="lightgrey" if col_idx == 2 else "#F0F0F0")
-			self.canvas1.tag_text.configure(fg=color, bg="lightgrey" if col_idx == 2 else "#F0F0F0")
+			self.canvas0.tag_text.configure(fg=color, bg="lightgrey" if col_idx == 2 else self.root_bg_color)
+			self.canvas1.tag_text.configure(fg=color, bg="lightgrey" if col_idx == 2 else self.root_bg_color)
 
 			self.all_tags[self.current_pair] = self.points
 
