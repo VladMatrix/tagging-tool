@@ -1,12 +1,21 @@
 # -*- mode: python ; coding: utf-8 -*-
+import os
+import sys
 
+#project_dir = os.path.abspath(os.path.dirname(__file__))  # Directory of the .spec file
+sys.path.insert(0, os.getcwd())
+
+from constants import __VERSION__
+
+
+build_name = f"iCAT-{__VERSION__}"
 
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
     datas=[],
-    hiddenimports=[],
+    hiddenimports=['PIL._tkinter_finder'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -22,7 +31,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='main',
+    name=build_name,
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

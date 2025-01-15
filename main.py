@@ -1,6 +1,5 @@
 import argparse
 
-from image_tagging_tool import ImageTaggingTool
 from constants import __VERSION__
 import sys
 import traceback
@@ -23,5 +22,8 @@ if "__main__" == __name__:
 
     if args.tiny_window and args.small_window:
         raise RuntimeError("Only one of --tiny-window or --small-window can be used.")
+
+
+    from image_tagging_tool import ImageTaggingTool
 
     ImageTaggingTool(args.small_window, args.tiny_window)
