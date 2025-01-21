@@ -25,14 +25,10 @@ class ImageTaggingTool:
 		self.root = tk.Tk()
 		RES_W, RES_H = self.root.wm_maxsize()
 		if RES_W < 1400 or tiny_window:
-			# RES_H = 768
-			# RES_W = 1366
-			CANVAS_W = 550
-			CANVAS_H = 550
+			CANVAS_W = 520
+			CANVAS_H = 520
 			TAG_W = 20
 		elif RES_W <= 1920 or small_window:
-			# RES_H = 1080
-			# RES_W = 1920
 			CANVAS_W = 800
 			CANVAS_H = 800
 			TAG_W = 22
@@ -66,7 +62,7 @@ class ImageTaggingTool:
 		self.pan_start_y = 0
 
 		# Brand version label
-		tk.Label(self.root, text=f"V{__VERSION__}", font=("Arial", 12)).grid(row=10, column=0, sticky='sw',
+		tk.Label(self.root, text=f"V{__VERSION__}", font=("Arial", 12)).grid(row=7, column=0, sticky='sw',
 		                                                                     padx=10, pady=0)
 
 		# Navigation buttons

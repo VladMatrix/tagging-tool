@@ -8,7 +8,7 @@ sys.path.insert(0, os.getcwd())
 from constants import __VERSION__
 
 
-build_name = f"iCAT-{__VERSION__}"
+build_name = f"main-{__VERSION__}"
 
 a = Analysis(
     ['main.py'],

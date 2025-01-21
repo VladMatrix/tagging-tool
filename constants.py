@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 
-__VERSION__ = "1.0.4"
+__VERSION__ = "1.0.5rc"
 
 MAX_COLORS = 10
 IMG_SCALES = (1, 1.5, 2.1, 3, 4.5, 6.5, 9)
