@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 
-__VERSION__ = "1.0.5rc"
+__VERSION__ = "1.0.6"
 
 MAX_COLORS = 10
-IMG_SCALES = (1, 1.5, 2.1, 3, 4.5, 6.5, 9)
+IMG_SCALES = (0.7, 0.9, 1, 1.5, 2.1, 3, 4.5, 6.5, 9)
+NEUTRAL_ZOOM_IDX = IMG_SCALES.index(1)
+
 IMG_FILES = (".jpg", ".jpeg", ".png")
 
 TAG_LABEL_BG = "#c8c8d2"
