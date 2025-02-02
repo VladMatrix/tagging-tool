@@ -5,7 +5,8 @@ import tkinter as tk
 from collections import Counter
 from PIL import Image, ImageTk, ImageFile
 import json
-from constants import IMG_SCALES, IMG_FILES, NEUTRAL_ZOOM_IDX
+from constants import IMG_SCALES, IMG_FILES, NEUTRAL_ZOOM_IDX, PT_BASE_SIZE, PT_ZOOM_SCALE_FACTOR, PT_MINIMUM_SIZE, \
+    PT_SELECTED_EXTRA_SIZE
 
 
 class Canvas(tk.Canvas):
@@ -230,3 +231,16 @@ def get_display_dir(data_dir: str) -> str:
         display_dir = f"...{display_dir}"
 
     return display_dir
+
+
+def get_point_size(*, canvas_scale_idx: int, selected: bool) -> int:
+    pt_size = PT_BASE_SIZE
+    pt_size = max(pt_size + PT_ZOOM_SCALE_FACTOR * (canvas_scale_idx + 1 - NEUTRAL_ZOOM_IDX), PT_MINIMUM_SIZE)
+
+    if selected:
+        if pt_size == PT_MINIMUM_SIZE:
+            pt_size *= 2
+        else:
+            pt_size += PT_SELECTED_EXTRA_SIZE
+
+    return pt_size

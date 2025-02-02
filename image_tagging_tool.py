@@ -8,12 +8,11 @@ from tkinter import filedialog, messagebox, ttk
 
 from PIL import Image
 
-from constants import __VERSION__, MAX_COLORS, IMG_SCALES, IMG_FILES, PT_SELECTED_EXTRA_SIZE, PT_BASE_SIZE, \
-    PT_ZOOM_SCALE_FACTOR, \
+from constants import __VERSION__, MAX_COLORS, IMG_SCALES, IMG_FILES, \
     INTERVAL_SAVE, INTERVAL_POLL, PointsType, PT_OUTLINE_WIDTH, NEUTRAL_ZOOM_IDX
 from utils import generate_rainbow_colors, generate_image_pyramid, put_image_on_canvas, get_canvas_position, \
     apply_image_scaling, in_canvas_coords, in_image_coords, Canvas, reset_canvases, format_tag, make_pairs, \
-    read_tags_file, get_tag_name_convention, find_closest, get_centered_oval_bbox, get_display_dir
+    read_tags_file, get_tag_name_convention, find_closest, get_centered_oval_bbox, get_display_dir, get_point_size
 
 
 class ImageTaggingTool:
@@ -317,11 +316,10 @@ class ImageTaggingTool:
         for i, point in enumerate(canvas.points):
             if i == canvas.selected_tag_idx:
                 outline = "#FFFFFF"
-                pt_size = PT_BASE_SIZE + PT_SELECTED_EXTRA_SIZE + PT_ZOOM_SCALE_FACTOR * (
-                            canvas.scale_idx + 1 - NEUTRAL_ZOOM_IDX)
+                pt_size = get_point_size(canvas_scale_idx=canvas.scale_idx, selected=True)
             else:
                 outline = "#000000"
-                pt_size = PT_BASE_SIZE + PT_ZOOM_SCALE_FACTOR * (canvas.scale_idx + 1 - NEUTRAL_ZOOM_IDX)
+                pt_size = get_point_size(canvas_scale_idx=canvas.scale_idx, selected=False)
 
             dim = 1 + pt_size * 2
             color = self.colors[i % MAX_COLORS]
@@ -330,7 +328,7 @@ class ImageTaggingTool:
             canvas.create_oval(x1, y1, x2, y2, width=PT_OUTLINE_WIDTH, fill=color, outline=outline, tags="point")
 
         if point := canvas.temp_point:
-            pt_size = PT_BASE_SIZE + PT_ZOOM_SCALE_FACTOR * (canvas.scale_idx + 1 - NEUTRAL_ZOOM_IDX)
+            pt_size = get_point_size(canvas_scale_idx=canvas.scale_idx, selected=False)
             dim = 1 + pt_size * 2
             canvas_x, canvas_y = in_canvas_coords(point, canvas)
             x1, y1, x2, y2 = get_centered_oval_bbox((canvas_x, canvas_y), dim, dim, PT_OUTLINE_WIDTH)
@@ -363,7 +361,7 @@ class ImageTaggingTool:
             elif (img_point := in_image_coords(event.x, event.y, click_canvas)) != (-1, -1):
 
                 if not click_canvas.twin.temp_point:
-                    if (close_point_idx := find_closest(img_point, click_canvas.points, click_canvas.scale_idx)) != -1:
+                    if (close_point_idx := find_closest(img_point, click_canvas.points, click_canvas.scale_idx - NEUTRAL_ZOOM_IDX)) != -1:
                         self.on_tag_selected_from_image(close_point_idx)
                         return
                     else:
